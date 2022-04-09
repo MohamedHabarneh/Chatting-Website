@@ -1,0 +1,179 @@
+body {
+  background: #242630;
+  margin: 0;
+}
+
+.navbar {
+  background: white;
+  padding: 1em;
+}
+
+.navbar .logo {
+  text-decoration: none;
+  font-weight: bold;
+  color: black;
+  font-size: 1.2em;
+}
+
+.navbar nav {
+  display: none;
+}
+
+.navbar .container {
+  display: flex;
+  place-content: space-between;
+}
+
+.navbar .mobile-menu {
+  cursor: pointer;
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+section {
+  padding: 5em;
+}
+
+.hero {
+  text-align: center;
+}
+
+.left-col h1 {
+  font-size: 2.5em;
+  line-height: 1.3em;
+  margin-top: 0.2em;
+  color: white;
+}
+.left-col h3 {
+  color: white;
+}
+
+.left-col .hero-cta a {
+  background: white;
+  color: black;
+  text-decoration: none;
+  padding: 12px 36px 12px 36px;
+  font-size: 1.2em;
+  border-radius: 8px;
+  font-weight: bold;
+  display: inline-block;
+}
+
+.hero-alt {
+  width: 70%;
+  margin-top: 3em;
+}
+
+nav.menu-btn {
+  display: block;
+}
+
+nav {
+  position: fixed;
+  z-index: 99;
+  background: white;
+  width: 66%;
+  right: 0;
+  top: 0;
+  height: 70vh;
+  padding: 1em;
+}
+
+nav ul.primary-nav {
+  margin-top: 0.5em;
+}
+
+nav li a {
+  color: black;
+  text-decoration: none;
+  display: block;
+  padding: 0.5em;
+  font-size: 1.2em;
+}
+
+.navbar nav li a .current {
+  color: white;
+}
+nav li:hover {
+  font-weight: bold;
+}
+
+.mobile-menu-exit {
+  color: black;
+  float: right;
+  margin: 0.5em;
+  cursor: pointer;
+}
+
+@media only screen and (min-width: 768px) {
+  .mobile-menu,
+  .mobile-menu-exit {
+    display: none;
+  }
+
+  .navbar .container {
+    display: grid;
+    grid-template-columns: 180px auto;
+    padding: 0;
+  }
+  .navbar nav {
+    display: flex;
+    justify-content: space-between;
+    justify-content: right;
+    background: none;
+    position: unset;
+    height: auto;
+    width: 100%;
+    padding: 0;
+  }
+  .navbar nav ul {
+    display: flex;
+    justify-content: right;
+  }
+  .navbar nav a {
+    color: black;
+    font-size: 1em;
+    justify-content: right;
+    padding: 0.1em 1em;
+  }
+  .navbar nav .primary-nav {
+    margin: 0;
+  }
+}
+
+@media only screen and (min-width: 1080px) {
+  .container {
+    width: 1080px;
+    margin: 0px;
+  }
+  section {
+    padding: 10em 4em;
+  }
+  .hero .container {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+  }
+  .hero .container .left-col {
+    margin: 3em 3em 0 0.5em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0px;
+  }
+  .hero .container .left-col h1 {
+    font-size: 3em;
+    width: 100%;
+  }
+  .hero-alt {
+    position: flex;
+    width: 671px;
+    height: 678px;
+    margin-left: 1em;
+  }
+}
