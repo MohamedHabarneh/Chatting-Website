@@ -14,29 +14,31 @@
             <img id="mobile-cta" class="mobile-menu" src="./images/menu.svg" alt="open menu"> 
 
             <nav class="nav-list">
-                <img id="mobile-exit" class="mobile-menu-exit"  src="/images/exit.svg" alt="exit menu">
+                <img id="mobile-exit" class="mobile-menu-exit"  src="./images/exit.svg" alt="exit menu">
                 <br>
                 <ul class="primary-nav">
                     <li class="current"><a href="#">Home</a></li>
-                    <li><a href="#">Chat</a></li>
+                    <li><a href="/chatting.html">Chat</a></li>
                     <li><a href="#">About</a></li>
                 </ul>
             </nav>
         </div>
     </div>
 
-    <section class="hero">
-        <div class="container">
-            <div class="left-col">
-                <h1>Welcome To <br>ChatBox</h1>
-                <h3> A Fun way to chat!</h3>
-                <div class="hero-cta">
-                    <a href="#">Create Account</a>
+    <div class="container2">
+        <section class="hero">
+            <div class="container">
+                <div class="left-col">
+                    <h1>Welcome To <br>ChatBox</h1>
+                    <h3> A Fun way to chat!</h3>
+                    <div class="hero-cta">
+                        <a href="#">Create Account</a>
+                    </div>
                 </div>
+                <img class="hero-alt" src="../images/chat_image.svg" alt="chatting image">
             </div>
-            <img class="hero-alt" src="/images/chat_image.svg" alt="chatting image">
-        </div>
-    </section>
+        </section>
+    </div>
     <script>
         const mobileBtn = document.getElementById('mobile-cta');
             nav = document.querySelector('nav');
@@ -48,8 +50,7 @@
             mobileBtnExit.addEventListener('click',()=>{
                 nav.classList.remove('menu-btn');
             })
-        
-
     </script>
 </body>
+
 </html>
