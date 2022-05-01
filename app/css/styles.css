@@ -39,7 +39,15 @@ section {
 }
 
 .hero {
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero .container{
+  margin-right:-24px;
+  background-color: #41444d;
+  padding: 185.5px;
 }
 
 .left-col h1 {
@@ -60,13 +68,8 @@ section {
   font-size: 1.2em;
   border-radius: 8px;
   font-weight: bold;
-  display: inline-block;
 }
 
-.hero-alt {
-  width: 70%;
-  margin-top: 3em;
-}
 
 nav.menu-btn {
   display: block;
@@ -176,4 +179,27 @@ nav li:hover {
     height: 678px;
     margin-left: 1em;
   }
+}
+
+footer{
+  bottom: 0;
+  width: 100%;
+}
+
+footer .container .items{
+  display: flex;
+  justify-content: end;
+}
+
+footer .container .github-logo{
+  padding: 16px;
+}
+
+ion-icon{
+  color: white;
+  font-size: 24px;
+  transition: .25s ease-in-out;
+}
+ion-icon:hover{
+  color: blue;
 }
