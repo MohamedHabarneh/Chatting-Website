@@ -191,10 +191,6 @@ footer .container .items{
   justify-content: end;
 }
 
-footer .container .github-logo{
-  padding: 16px;
-}
-
 ion-icon{
   color: white;
   font-size: 24px;
