@@ -3,9 +3,11 @@
 const express = require('express')
 const cors = require('cors')
 const http = require('http')
+const dotenv = require('dotenv')
+dotenv.config();
 const mongo = require('mongodb')
 const MongoClient = mongo.MongoClient
-const url = 'mongodb://localhost:27017/chatBox'
+const url = `mongodb+srv://chatBox_CPSC349:${process.env.MONGODB_PASS}@chatbox.vfom0.mongodb.net/test`
 const socketio = require('socket.io')
 
 const app = express();
