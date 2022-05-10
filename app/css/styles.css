@@ -70,6 +70,16 @@ section {
   font-weight: bold;
 }
 
+.left-col .hero-cta2 a {
+  background: white;
+  color: black;
+  text-decoration: none;
+  padding: 12px 36px 12px 36px;
+  font-size: 1.2em;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
 
 nav.menu-btn {
   display: block;

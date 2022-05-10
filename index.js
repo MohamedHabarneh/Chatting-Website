@@ -7,7 +7,7 @@ const dotenv = require('dotenv')
 dotenv.config();
 const mongo = require('mongodb')
 const MongoClient = mongo.MongoClient
-const url = `mongodb+srv://chatBox_CPSC349:${process.env.MONGODB_PASS}@chatbox.vfom0.mongodb.net/test`
+const url = 'mongodb+srv://chatBoxGroup:ZnoCVIJmXqB5V4Aa@chatbox.rxzqy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
 const socketio = require('socket.io')
 
 const app = express();
@@ -23,7 +23,7 @@ app.use(express.static(__dirname+'/app'))
 const path = require('path')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
-const User = require('./model/user')
+const User = require('./models/user')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 
@@ -80,65 +80,64 @@ app.use(bodyParser.json())
 
 
 app.post('/api/login', async (req, res) => {
-	const { username, password } = req.body
-	const user = await User.findOne({ username }).lean()
-
-	if (!user) {
-		return res.json({ status: 'error', error: 'Invalid username/password' })
-	}
-
-	if (await bcrypt.compare(password, user.password)) {
-		// the username, password combination is successful
-
-		const token = jwt.sign(
-			{
-				id: user._id,
-				username: user.username
-			},
-			JWT_SECRET
-		)
-
-		return res.json({ status: 'ok', data: token })
-	}
-
-	res.json({ status: 'error', error: 'Invalid username/password' })
+    MongoClient.connect(url, function(err,db){
+        if(err) throw err;
+        const dbo = db.db("chatBox"); //this connect to db
+        const { username, password} = req.body
+        console.log(username)
+        console.log(password)
+        var query = {username: username, password: password};
+        dbo.collection("users").find(query).toArray(function(err, result) {
+            if (err) throw err;
+            console.log("User was found")
+            var myobj = { username: username, status: "online" };
+            dbo.collection("online").insertOne(myobj, function(err, res) {
+                if (err) throw err;
+                console.log("inserted user to the online group");
+                db.close()
+              });
+            console.log(result);
+          });
+        })
 })
 
+
 app.post('/api/register', async (req, res) => {
-	const { username, password: plainTextPassword } = req.body
+    console.log(req.body)
+    MongoClient.connect(url,function(err,db){
+        if(err) throw err;
+        const dbo = db.db("chatBox"); // connect to db
 
-	if (!username || typeof username !== 'string') {
-		return res.json({ status: 'error', error: 'Invalid username' })
-	}
+        const { username, password: plainTextPassword } = req.body
+        const password =  bcrypt.hash(plainTextPassword, 10)
+        console.log(password)
+        if (!username || typeof username !== 'string') {
+            return res.json({ status: 'error', error: 'Invalid username' })
+        }
+    
+        if (!plainTextPassword || typeof plainTextPassword !== 'string') {
+            return res.json({ status: 'error', error: 'Invalid password' })
+        }
+    
+        if (plainTextPassword.length < 5) {
+            return res.json({
+                status: 'error',
+                error: 'Password too small. Should be atleast 6 characters'
+            })
+        }
+         let userObj = new Object();
+         userObj.username = req.body.username;
+         userObj.password = req.body.password;
 
-	if (!plainTextPassword || typeof plainTextPassword !== 'string') {
-		return res.json({ status: 'error', error: 'Invalid password' })
-	}
-
-	if (plainTextPassword.length < 5) {
-		return res.json({
-			status: 'error',
-			error: 'Password too small. Should be atleast 6 characters'
-		})
-	}
-
-	const password = await bcrypt.hash(plainTextPassword, 10)
-
-	try {
-		const response = await User.create({
-			username,
-			password
-		})
-		console.log('User created successfully: ', response)
-	} catch (error) {
-		if (error.code === 11000) {
-			// duplicate key
-			return res.json({ status: 'error', error: 'Username already in use' })
-		}
-		throw error
-	}
-
-	res.json({ status: 'ok' })
+         dbo.collection("users").insertOne(userObj,function(err,result){
+            if(err) throw err;
+            else{
+                res.type('application/json')
+                res.status(200)
+                res.json(result)
+            }
+         })
+    })
 })
 
 server.listen(app.get('port'), function(){
