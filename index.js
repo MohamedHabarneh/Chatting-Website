@@ -7,7 +7,7 @@ const dotenv = require('dotenv')
 dotenv.config();
 const mongo = require('mongodb')
 const MongoClient = mongo.MongoClient
-const url = 'mongodb+srv://chatBoxGroup:ZnoCVIJmXqB5V4Aa@chatbox.rxzqy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
+const url = `mongodb+srv://chatBox_CPSC349:${process.env.MONGODB_PASS}@chatbox.vfom0.mongodb.net/test`
 const socketio = require('socket.io')
 
 const app = express();
@@ -26,8 +26,7 @@ const mongoose = require('mongoose')
 const User = require('./models/user')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-
-const JWT_SECRET = 'sdjkfh8923yhjdksbfma@#*(&@*!^#&@bhjb2qiuhesdbhjdsfg839ujkdhfjk'
+const alert = require('alert')
 
 
 MongoClient.connect(url,(err,db)=>{
@@ -84,21 +83,29 @@ app.post('/api/login', async (req, res) => {
         if(err) throw err;
         const dbo = db.db("chatBox"); //this connect to db
         const { username, password} = req.body
-        console.log(username)
-        console.log(password)
         var query = {username: username, password: password};
         dbo.collection("users").find(query).toArray(function(err, result) {
             if (err) throw err;
-            console.log("User was found")
+            if(result.length == 1) {
+                console.log("User was found")
+                res.send({status:true, data: result[0]})
+            } else {
+
+                res.send({status:false})
+            }
             var myobj = { username: username, status: "online" };
             dbo.collection("online").insertOne(myobj, function(err, res) {
                 if (err) throw err;
                 console.log("inserted user to the online group");
+                alert("Login successful!")
                 db.close()
               });
+            $('#login').hide();
+            $('#after-login').show();
             console.log(result);
           });
         })
+    console.log("done with function")
 })
 
 

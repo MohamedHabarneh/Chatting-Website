@@ -13,6 +13,11 @@
 			<input type="submit" value="Submit Form" />
 		</form>
 
+        <div id="after-login" style="display:none">
+            <h1 id="me"></h1>
+            <div id="user-list" class="user-list"></div>
+        </div>
+		
 		<script>
 			const form = document.getElementById('login')
 			form.addEventListener('submit', login)
