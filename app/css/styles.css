@@ -1,5 +1,7 @@
 body {
-  background: #242630;
+  /* background: #242630; */
+  /* background: #e6e9ff; */
+  background: #427AA1;
   margin: 0;
 }
 
@@ -46,9 +48,10 @@ section {
 
 .hero .container{
   margin-right:-24px;
-  background-color: #41444d;
-  padding: 185.5px;
+  background-color: #064789; /* before it was #41444d; #667aff;*/
+  padding: 147.5px;
 }
+
 
 .left-col h1 {
   font-size: 2.5em;
@@ -61,6 +64,7 @@ section {
 }
 
 .left-col .hero-cta a {
+  display:flex;
   background: white;
   color: black;
   text-decoration: none;
@@ -68,18 +72,38 @@ section {
   font-size: 1.2em;
   border-radius: 8px;
   font-weight: bold;
+}
+
+.users a {
+  display:flex;
+  background: white;
+  color: black;
+  text-decoration: none;
+  padding: 12px 36px 12px 36px;
+  font-size: 1.2em;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.left-col .hero-cta a:hover {
+  color: #427AA1;
 }
 
 .left-col .hero-cta2 a {
+  display: flex;
   background: white;
   color: black;
   text-decoration: none;
   padding: 12px 36px 12px 36px;
+  margin-top:3rem;
   font-size: 1.2em;
   border-radius: 8px;
   font-weight: bold;
 }
 
+.left-col .hero-cta2 a:hover {
+  color: #427AA1;
+}
 
 nav.menu-btn {
   display: block;
@@ -122,6 +146,7 @@ nav li:hover {
   cursor: pointer;
 }
 
+
 @media only screen and (min-width: 768px) {
   .mobile-menu,
   .mobile-menu-exit {
@@ -156,6 +181,11 @@ nav li:hover {
   .navbar nav .primary-nav {
     margin: 0;
   }
+    .hero-alt {
+    width: 70%;
+    margin-left: 1.5em;
+  }
+
 }
 
 @media only screen and (min-width: 1080px) {
@@ -184,10 +214,8 @@ nav li:hover {
     width: 100%;
   }
   .hero-alt {
-    position: flex;
-    width: 671px;
-    height: 678px;
-    margin-left: 1em;
+    width: 70%;
+    margin-left: 1.5em;
   }
 }
 
@@ -202,10 +230,63 @@ footer .container .items{
 }
 
 ion-icon{
-  color: white;
+  color: black;
   font-size: 24px;
   transition: .25s ease-in-out;
 }
 ion-icon:hover{
   color: blue;
+}
+
+
+/* userOnline css */
+
+.list-container{
+  display:grid;
+  justify-content: center;
+  align-items: center;
+  padding:0px;
+}
+
+.btn-container{
+  display:flex;
+  justify-content: center;
+  align-items: center;
+}
+
+ .btn {
+  display:flex;
+  justify-content: center;
+  align-items: center;
+	cursor: pointer;
+  padding:4px 16px 4px 16px;
+	font-weight: bold;
+	color: black;
+	border: 0;
+  border-radius: 6px;
+	font-size: 17px;
+}
+
+.btn:hover{
+	color:#427AA1;
+}
+
+.list-container .users{
+  display:grid;
+  justify-content: center;
+  align-items: center;
+}
+
+.list-container a {
+  background: white;
+  color: black;
+  text-decoration: none;
+  padding: 12px 36px 12px 36px;
+  font-size: 1.2em;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.list-container a:hover{
+	color:#427AA1;
 }

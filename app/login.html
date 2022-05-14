@@ -1,52 +1,43 @@
+
 <!DOCTYPE html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Login</title>
+		<link rel="stylesheet" href="css/chatStyles.css" />
 	</head>
 	<body>
-		<h1>Login</h1>
-		<form id="login">
-			<input type="text" autocomplete="off" id="username" placeholder="Username" />
-			<input type="password" autocomplete="off" id="password" placeholder="Password" />
-		    <input type="submit" value="Submit Form" />
-		</form>
-
-        <div id="after-login" style="display:none">
-            <h1 id="me"></h1>
-            <div id="user-list" class="user-list"></div>
-        </div>
-		<script src="https://cdn.socket.io/4.5.0/socket.io.min.js" integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k" crossorigin="anonymous"></script>
-		<script>
-			const form = document.getElementById('login')
-			form.addEventListener('submit', login)
-
-			async function login(event) {
-				event.preventDefault()
-				const username = document.getElementById('username').value
-				const password = document.getElementById('password').value
-				const result = await fetch('/api/login', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json'
-					},
-					body: JSON.stringify({
-						username,
-						password
-					})
-				}).then((res) => res.json())
-				if (result.status === 'ok') {
-					// everythign went fine
-					console.log('Got the token: ', result.data)
-					localStorage.setItem('token', result.data)
-					alert('Success')
-					window.location.href = 'http://localhost:3000/usersOnline.html'
-				} else {
-					alert('Did not work')
-				}
-			}
-		</script>
-		
+		<div class="login-container">
+			<main class="login-main">
+				<h1>Login</h1>
+				<form id="login" action="chatting.html">
+					<div class="form-control">
+						<label for="username">Username</label>
+						<input
+							type="text"
+							name="username"
+							id="username"
+							placeholder="Enter username..."
+							required
+						/>
+					</div>
+					<div class="form-control">
+						<label for="username">Password</label>
+						<input
+							type="password"
+							name="password"
+							id="password"
+							placeholder="Enter password..."
+							required
+						/>
+					</div>
+					<button onclick="window.location.href='http://localhost:3000/chatting.html'" type="submit" class="btn">Join Chat</button>
+				</form>
+			</main>
+		</div>
 	</body>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="login.js" defer></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </html>
