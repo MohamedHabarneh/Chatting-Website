@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Get users collection</title>
+    <link rel="stylesheet" href="./css/styles.css"> 
+  </head>
+  <body>
+      <div class="list-container">
+          <h1>Get the Users from the Users collection</h1>
+          <div class="btn-container">
+            <button class="btn" id="user-btn">Click!</button>
+          </div>
+          <div class="user-list" id="user-list"> </div>
+      </div>
+  </body>
+  <script>
+    const myButton = document.getElementById('user-btn')
+    myButton.addEventListener('click', showUsers)
+    async function showUsers(event) {
+      event.preventDefault()
+      const result = await fetch('/api/users', {
+        method: 'GET',
+      }).then(function(response) {
+        if(response.ok) return response.json();
+      })
+      let div = document.getElementById('user-list')
+      for(let i =0;i<result.length;i++){
+          div.appendChild(document.createElement('br'))
+          let aElem = document.createElement('a');
+          aElem.innerHTML= `${result[i].username}`;
+          aElem.href='chatting.html'
+          aElem.classList.add('users')
+          div.appendChild(aElem);
+          div.appendChild(document.createElement('br'))
+      }
+    }
+  </script>
+</html> 

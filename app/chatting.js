@@ -1,82 +1,68 @@
+const chatForm = document.getElementById('chat-form');
+const chatMessages = document.querySelector('.chat-messages');
 
+const clearBtn = document.getElementById('clear-btn')
+const logoutBtn = document.getElementById("logout-btn")
+//get username and room from url
 
-let currentStatus = document.getElementById("status")
-let messages = document.getElementById("chat-messages")
-let textarea = document.getElementById("msg")
-let username = document.getElementById("username")
-let sendBtn = document.getElementById('send-btn')
-let clearBtn = document.getElementById("clear-btn")
-
-document.querySelector('form.pure-form').addEventListener('submit',(e)=>{
-    e.preventDefault();
-    console.log(username.value)
-})
-
-    const statusDefault = currentStatus.textContent;
-
-    const setStatus = function(s){
-        currentStatus.textContent = s; 
-        if(s !== statusDefault){
-            const delay = setTimeout(function(){
-                setStatus(statusDefault)
-            },4000)
-        }
-    }
-
-//connect to socket.io
-
-let socket = io.connect('http://localhost:3000');
+// const {username,password} = Qs.parse(window.location.search,{
+//     ignoreQueryPrefix: true
+// });
 
 
 
-//check for connection
-if(socket !== undefined){
-    socket.on('output',function(data){
-        if(data.length){
-            for(let x = 0; x<data.length; x++){
-                let message = document.createElement('div');
-                message.setAttribute('class','chat-message');
-                message.textContent = data[x].name+": "+ data[x].message;
-                messages.appendChild(message);
-                messages.insertBefore(message,messages.firstChild)
-            }
-            for(let i = 1; i<messages.childNodes.length;i++){
-                messages.insertBefore(messages.childNodes[i],messages.firstChild)
-            }
-            // messages.append(...Array.from(messages.childNodes).reverse());  
-        }
-    })
-    socket.on('status',function(data){
-        
-        //get message status
-        setStatus((typeof data === 'object')? data.message : data);
+const socket = io();
 
-        if(data.clear){
-            textarea.value = '';
-        }
-    })
 
-    //handle input
-    document.querySelector('form.msg-form').addEventListener('submit',function(e){
-        e.preventDefault();
-        console.log(textarea.value)
-    })
-    textarea.addEventListener('keyup',function(event){
-        event.preventDefault();
-        if(event.key === 'Enter' && event.shiftKey == false){
-            socket.emit('input',{
-                name: username.value,
-                message: textarea.value
-            })
-        }
-    })
-
-    clearBtn.addEventListener('click',function(){
-        socket.emit('clear')
-    })
-
-    socket.on('cleared',function(){
-        messages.textContent = '';
-    })
+for(const key of window.localStorage.getItem('token')){
+    console.log(window.localStorage.getItem('token')[key])
 }
 
+socket.on('message', (message)=>{
+    console.log(message);
+    outputMessage(message);
+
+    //scroll down
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+})
+
+//Message submit 
+
+chatForm.addEventListener('submit',(e)=>{
+    e.preventDefault();
+
+    const msg = e.target.elements.msg.value;   
+
+    //emit msg to server
+    socket.emit('chatMessage',msg);
+
+    //clear input
+    e.target.elements.msg.value = '';
+    e.target.elements.msg.focus();
+})
+
+
+function outputMessage(message){
+    const div = document.createElement('div');
+    div.classList.add('message');
+    div.innerHTML = `
+    <p class="meta">${message.username} <span> ${message.time}</span></p>
+    <p class="text"> ${message.text}</p>`;
+    document.querySelector('div.chat-messages').appendChild(div);
+}
+
+
+clearBtn.addEventListener('click',function(){
+    socket.emit('clear')
+})
+
+socket.on('cleared',function(){
+    chatMessages.textContent = '';
+})
+
+
+
+logoutBtn.addEventListener('click', function(event){
+    event.preventDefault()
+    console.log("GOING TO LOG OUT")
+})

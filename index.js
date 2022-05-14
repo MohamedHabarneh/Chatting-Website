@@ -7,8 +7,9 @@ const dotenv = require('dotenv')
 dotenv.config();
 const mongo = require('mongodb')
 const MongoClient = mongo.MongoClient
-const url = `mongodb+srv://chatBox_CPSC349:${process.env.MONGODB_PASS}@chatbox.vfom0.mongodb.net/test`
+const url = `mongodb+srv://chatBoxGroup:${process.env.MONGODB_PASS}@chatbox.rxzqy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
 const socketio = require('socket.io')
+const formatMessage = require('./utils/messages')
 
 const app = express();
 app.set('port',3000)
@@ -28,50 +29,60 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const alert = require('alert')
 
+const botName = 'ChatBox bot';
+
+let clientSocketIds = [];
+let connectedUsers= [];
+
+const getSocketByUserId = (userId) =>{
+    let socket = '';
+    for(let i = 0; i<clientSocketIds.length; i++) {
+        if(clientSocketIds[i].userId == userId) {
+            socket = clientSocketIds[i].socket;
+            break;
+        }
+    }
+    return socket;
+}
 
 MongoClient.connect(url,(err,db)=>{
-    if(err) throw err;
-    console.log('connected mongodb!')
-    io.on('connect',function(socket){
-        const dbo = db.db('chatBox')
-        
-        const sendStatus = (s) =>{
-            socket.emit('status',s)
-        }
+    
+io.on('connection',(socket)=>{
 
-        //get chats from collection
-        dbo.collection('chats').find().limit(50).sort({_id:1}).toArray(function(err,result){
-            if(err) throw err
-            
-            //emit messages
-            socket.emit('output',result)
-        })
-        socket.on('input',function(data){
-            let name = data.name;
-            let message = data.message;
+    const dbo = db.db('chatBox')
+    socket.emit('message', formatMessage(botName,'Welcome to ChatBox'));
 
-            if(name == '' || message == ''){
-                sendStatus('Please enter a name and message.');
-            }else{
-                //Insert into db
-                dbo.collection('chats').insertOne({name, message},function(){
-                    io.emit('output',[data]);
-                    sendStatus({
-                        message: 'Message sent',
-                        clear: true
-                    })
-                })
-            }
-        });
+    //Broadcast when a user connects
+    socket.broadcast.emit('message',formatMessage(botName,'A user has joined the chat'));
 
-        //Handle clear 
-        socket.on('clear', function(data){
-            //remove chats
-            dbo.collection('chats').deleteMany({},function(){
-                socket.emit('cleared');
-            })
+    //runs when client disconnects
+    socket.on('disconnect',()=>{
+        io.emit('message',formatMessage(botName,'A user has left the chat'));
+    });
+
+    //Listen for chatMessage
+    socket.on('chatMessage',(msg)=>{
+        io.emit('message',formatMessage('user',msg));
+        dbo.collection('chats').insertOne({name:'user', message:msg},function(err,result){
+            if(err) throw err;
         })
     })
+
+    socket.on('clear', function(data){
+        //remove chats
+        dbo.collection('chats').deleteMany({},function(){
+            socket.emit('cleared');
+        })
+    })
+
+    //when they login not being used rn idk how to use it
+    socket.on('loggedin', function(user) {
+        clientSocketIds.push({socket: socket, userId:  user.user_id});
+        connectedUsers = connectedUsers.filter(item => item.user_id != user.user_id);
+        connectedUsers.push({...user, socketId: socket.id})
+        io.emit('updateUserList', connectedUsers)
+    });
+});
 });
 
 
@@ -88,21 +99,26 @@ app.post('/api/login', async (req, res) => {
             if (err) throw err;
             if(result.length == 1) {
                 console.log("User was found")
-                res.send({status:true, data: result[0]})
+                let myObj = new Object();
+                myObj.username = username;
+                myObj.status = 'online';
+                dbo.collection('online').find(myObj).toArray(function(err,result2){
+                    if(err) throw err;
+                    if(result2.length == 1){
+                        console.log('user is already online!')
+                    }
+                    else if(result2.length==0){
+                        dbo.collection("online").insertOne(myObj, function(err, result3) {
+                            if (err) throw err;
+                            // console.log("inserted user to the online group",result3);
+                            db.close()
+                          });
+                    }
+                })
+                res.send({status:true})
             } else {
-
                 res.send({status:false})
             }
-            var myobj = { username: username, status: "online" };
-            dbo.collection("online").insertOne(myobj, function(err, res) {
-                if (err) throw err;
-                console.log("inserted user to the online group");
-                alert("Login successful!")
-                db.close()
-              });
-            $('#login').hide();
-            $('#after-login').show();
-            console.log(result);
           });
         })
     console.log("done with function")
@@ -136,16 +152,34 @@ app.post('/api/register', async (req, res) => {
          userObj.username = req.body.username;
          userObj.password = req.body.password;
 
-         dbo.collection("users").insertOne(userObj,function(err,result){
+         
+         dbo.collection('users').find(userObj).toArray(function(err,result){
             if(err) throw err;
-            else{
-                res.type('application/json')
-                res.status(200)
-                res.json(result)
+            console.log(result)
+            if(result.length==1){
+                console.log('user is already registered')
+            }
+            else if(result.length==0){
+                dbo.collection("users").insertOne(userObj,function(err,result){
+                   if(err) throw err;
+                })
             }
          })
     })
 })
+
+//gets users
+app.get('/api/users', (req, res) => {
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("chatBox");
+        dbo.collection('users').find({}).toArray((err, result) => {
+            if (err) return console.log(err);
+            console.log(result); //returns the object of users as an array i beleive?
+            res.send(result);
+          });
+    })
+}); 
 
 server.listen(app.get('port'), function(){
 	console.log('Express server started on http://localhost:' + app.get('port'));
