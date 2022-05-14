@@ -7,6 +7,8 @@ let username = document.getElementById("username")
 let sendBtn = document.getElementById('send-btn')
 let clearBtn = document.getElementById("clear-btn")
 
+let logoutBtn = document.getElementById("logout-btn")
+
 document.querySelector('form.pure-form').addEventListener('submit',(e)=>{
     e.preventDefault();
     console.log(username.value)
@@ -71,8 +73,16 @@ if(socket !== undefined){
         }
     })
 
+    //if the clear button is pressed, clear the messages
     clearBtn.addEventListener('click',function(){
+        console.log("hello")
         socket.emit('clear')
+    })
+
+    //if the logout button is pressed, remove person from the online status
+    logoutBtn.addEventListener('click', function(event){
+        event.preventDefault()
+        console.log("GOING TO LOG OUT")
     })
 
     socket.on('cleared',function(){

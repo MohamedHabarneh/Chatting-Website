@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Get users collection</title>
+  </head>
+  <body>
+    <h1>Get the Users from the Users collection</h1>
+    <button id="myButton">Click!</button>
+  </body>
+  <script>
+    const myButton = document.getElementById('myButton')
+    myButton.addEventListener('click', showUsers)
+    async function showUsers(event) {
+      event.preventDefault()
+      const result = await fetch('/api/users', {
+        method: 'GET',
+      }).then(function(response) {
+        if(response.ok) return response.json();
+      })
+    }
+  </script>
+</html>

@@ -10,14 +10,14 @@
 		<form id="login">
 			<input type="text" autocomplete="off" id="username" placeholder="Username" />
 			<input type="password" autocomplete="off" id="password" placeholder="Password" />
-			<input type="submit" value="Submit Form" />
+		    <input type="submit" value="Submit Form" />
 		</form>
 
         <div id="after-login" style="display:none">
             <h1 id="me"></h1>
             <div id="user-list" class="user-list"></div>
         </div>
-		
+		<script src="https://cdn.socket.io/4.5.0/socket.io.min.js" integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k" crossorigin="anonymous"></script>
 		<script>
 			const form = document.getElementById('login')
 			form.addEventListener('submit', login)
@@ -26,7 +26,6 @@
 				event.preventDefault()
 				const username = document.getElementById('username').value
 				const password = document.getElementById('password').value
-
 				const result = await fetch('/api/login', {
 					method: 'POST',
 					headers: {
@@ -37,16 +36,17 @@
 						password
 					})
 				}).then((res) => res.json())
-
 				if (result.status === 'ok') {
 					// everythign went fine
 					console.log('Got the token: ', result.data)
 					localStorage.setItem('token', result.data)
 					alert('Success')
+					window.location.href = 'http://localhost:3000/usersOnline.html'
 				} else {
-					alert(result.error)
+					alert('Did not work')
 				}
 			}
 		</script>
+		
 	</body>
 </html>

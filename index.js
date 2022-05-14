@@ -27,7 +27,7 @@ const User = require('./models/user')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const alert = require('alert')
-
+  
 
 MongoClient.connect(url,(err,db)=>{
     if(err) throw err;
@@ -77,6 +77,20 @@ MongoClient.connect(url,(err,db)=>{
 
 app.use(bodyParser.json())
 
+//get request that gets the list of user in users collection
+//activates off of button call from usersOnline.html
+app.get('/api/users', (req, res) => {
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("chatBox");
+        dbo.collection('users').find().toArray((err, result) => {
+            if (err) return console.log(err);
+            console.log(result); //returns the object of users as an array i beleive?
+            res.send(result);
+          });
+    })
+}); 
+
 
 app.post('/api/login', async (req, res) => {
     MongoClient.connect(url, function(err,db){
@@ -88,23 +102,20 @@ app.post('/api/login', async (req, res) => {
             if (err) throw err;
             if(result.length == 1) {
                 console.log("User was found")
-                res.send({status:true, data: result[0]})
+                var myobj = { username: username, status: "online" };
+                dbo.collection("online").insertOne(myobj, function(err, result2) {
+                    if (err) throw err;
+                    let foundUser = true;
+                    console.log("inserted user to the online group");
+                    db.close()
+                });
+                res.send({ status: 'ok' }); //sends the ok status for login.html to move onto new screen
             } else {
-
-                res.send({status:false})
+                result2.send({status:false})
             }
-            var myobj = { username: username, status: "online" };
-            dbo.collection("online").insertOne(myobj, function(err, res) {
-                if (err) throw err;
-                console.log("inserted user to the online group");
-                alert("Login successful!")
-                db.close()
-              });
-            $('#login').hide();
-            $('#after-login').show();
             console.log(result);
-          });
-        })
+        });
+    })
     console.log("done with function")
 })
 
