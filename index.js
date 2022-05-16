@@ -8,7 +8,8 @@ const dotenv = require('dotenv')
 dotenv.config();
 const mongo = require('mongodb')
 const MongoClient = mongo.MongoClient
-const url = `mongodb+srv://chatBoxGroup:${process.env.MONGODB_PASS}@chatbox.rxzqy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
+//const url = `mongodb+srv://chatBoxGroup:${process.env.MONGODB_PASS}@chatbox.rxzqy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
+const url = 'mongodb+srv://chatBoxGroup:ZnoCVIJmXqB5V4Aa@chatbox.rxzqy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
 const socketio = require('socket.io')
 const formatMessage = require('./utils/messages')
 
@@ -47,43 +48,48 @@ const getSocketByUserId = (userId) =>{
 }
 
 MongoClient.connect(url,(err,db)=>{
-    
-io.on('connection',(socket)=>{
 
     const dbo = db.db('chatBox')
-    socket.emit('message', formatMessage(botName,'Welcome to ChatBox'));
+    const projection = { _id: 0, username: 1};
+    dbo.collection('online').find({}).project(projection).toArray((err, result) => {
+        if (err) return console.log(err);
+        const user = result[(result.length) - 1].username;
+        io.on('connection',(socket)=>{
+            //console.log(dbo.table.find({}, { array: { $slice: -1 } }));
+            socket.emit('message', formatMessage(botName,'Welcome to ChatBox'));
 
-    //Broadcast when a user connects
-    socket.broadcast.emit('message',formatMessage(botName,'A user has joined the chat'));
+            //Broadcast when a user connects
+            socket.broadcast.emit('message',formatMessage(user,'A user has joined the chat'));
 
-    //runs when client disconnects
-    socket.on('disconnect',()=>{
-        io.emit('message',formatMessage(botName,'A user has left the chat'));
+            //runs when client disconnects
+            socket.on('disconnect',()=>{
+                io.emit('message',formatMessage(user,'A user has left the chat'));
+            });
+
+            //Listen for chatMessage
+            socket.on('chatMessage',(msg)=>{
+                io.emit('message',formatMessage(user,msg));
+                dbo.collection('chats').insertOne({name:user, message:msg},function(err,result){
+                    if(err) throw err;
+                })
+            })
+
+            socket.on('clear', function(data){
+                //remove chats
+                dbo.collection('chats').deleteMany({},function(){
+                    socket.emit('cleared');
+                })
+            })
+
+            //when they login not being used rn idk how to use it
+            socket.on('loggedin', function(user) {
+                clientSocketIds.push({socket: socket, userId:  user.user_id});
+                connectedUsers = connectedUsers.filter(item => item.user_id != user.user_id);
+                connectedUsers.push({...user, socketId: socket.id})
+                io.emit('updateUserList', connectedUsers)
+            });
+        });
     });
-
-    //Listen for chatMessage
-    socket.on('chatMessage',(msg)=>{
-        io.emit('message',formatMessage('user',msg));
-        dbo.collection('chats').insertOne({name:'user', message:msg},function(err,result){
-            if(err) throw err;
-        })
-    })
-
-    socket.on('clear', function(data){
-        //remove chats
-        dbo.collection('chats').deleteMany({},function(){
-            socket.emit('cleared');
-        })
-    })
-
-    //when they login not being used rn idk how to use it
-    socket.on('loggedin', function(user) {
-        clientSocketIds.push({socket: socket, userId:  user.user_id});
-        connectedUsers = connectedUsers.filter(item => item.user_id != user.user_id);
-        connectedUsers.push({...user, socketId: socket.id})
-        io.emit('updateUserList', connectedUsers)
-    });
-});
 });
 
 
@@ -183,6 +189,6 @@ app.get('/api/users', (req, res) => {
 }); 
 
 server.listen(app.get('port'), function(){
-	console.log('Express server started on http://localhost:' + app.get('port'));
+	console.log('Express server started on http://localhost:' + app.get('port') + '/login.html');
 	// console.log(__dirname)
 })
