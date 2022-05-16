@@ -7,7 +7,12 @@ const dotenv = require('dotenv')
 dotenv.config();
 const mongo = require('mongodb')
 const MongoClient = mongo.MongoClient
+<<<<<<< Updated upstream
 const url = `mongodb+srv://chatBox_CPSC349:${process.env.MONGODB_PASS}@chatbox.vfom0.mongodb.net/test`
+=======
+const url = `mongodb+srv://chatBoxGroup:${process.env.MONGODB_PASS}@chatbox.rxzqy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
+
+>>>>>>> Stashed changes
 const socketio = require('socket.io')
 
 const app = express();
@@ -30,6 +35,7 @@ const alert = require('alert')
 
 
 MongoClient.connect(url,(err,db)=>{
+<<<<<<< Updated upstream
     if(err) throw err;
     console.log('connected mongodb!')
     io.on('connect',function(socket){
@@ -72,6 +78,50 @@ MongoClient.connect(url,(err,db)=>{
             })
         })
     })
+=======
+
+    const dbo = db.db('chatBox')
+    const projection = { _id: 0, username: 1};
+    dbo.collection('online').find({}).project(projection).toArray((err, result) => {
+        if (err) return console.log(err);
+        const user = result[(result.length) - 1].username;
+        io.on('connection',(socket)=>{
+            //console.log(dbo.table.find({}, { array: { $slice: -1 } }));
+            socket.emit('message', formatMessage(botName,'Welcome to ChatBox'));
+
+            //Broadcast when a user connects
+            socket.broadcast.emit('message',formatMessage(user,'A user has joined the chat'));
+
+            //runs when client disconnects
+            socket.on('disconnect',()=>{
+                io.emit('message',formatMessage(user,'A user has left the chat'));
+            });
+
+            //Listen for chatMessage
+            socket.on('chatMessage',(msg)=>{
+                io.emit('message',formatMessage(user,msg));
+                dbo.collection('chats').insertOne({name:user, message:msg},function(err,result){
+                    if(err) throw err;
+                })
+            })
+
+            socket.on('clear', function(data){
+                //remove chats
+                dbo.collection('chats').deleteMany({},function(){
+                    socket.emit('cleared');
+                })
+            })
+
+            //when they login not being used rn idk how to use it
+            socket.on('loggedin', function(user) {
+                clientSocketIds.push({socket: socket, userId:  user.user_id});
+                connectedUsers = connectedUsers.filter(item => item.user_id != user.user_id);
+                connectedUsers.push({...user, socketId: socket.id})
+                io.emit('updateUserList', connectedUsers)
+            });
+        });
+    });
+>>>>>>> Stashed changes
 });
 
 
@@ -88,6 +138,7 @@ app.post('/api/login', async (req, res) => {
             if (err) throw err;
             if(result.length == 1) {
                 console.log("User was found")
+<<<<<<< Updated upstream
                 res.send({status:true, data: result[0]})
             } else {
 
@@ -105,6 +156,22 @@ app.post('/api/login', async (req, res) => {
             console.log(result);
           });
         })
+=======
+                var myobj = { username: username, status: "online" };
+                dbo.collection("online").insertOne(myobj, function(err, result2) {
+                    if (err) throw err;
+                    let foundUser = true;
+                    console.log("inserted user to the online group");
+                    db.close()
+                });
+                res.send({ status: 'ok' }); //sends the ok status for login.html to move onto new screen
+            } else {
+                result2.send({status:false})
+            }
+            console.log(result);
+        });
+    })
+>>>>>>> Stashed changes
     console.log("done with function")
 })
 
@@ -148,6 +215,6 @@ app.post('/api/register', async (req, res) => {
 })
 
 server.listen(app.get('port'), function(){
-	console.log('Express server started on http://localhost:' + app.get('port'));
+	console.log('Express server started on http://localhost:' + app.get('port') + '/login.html');
 	// console.log(__dirname)
 })

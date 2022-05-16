@@ -6,6 +6,7 @@
 		<title>Document</title>
 	</head>
 	<body>
+<<<<<<< Updated upstream
 		<h1>Registration</h1>
 		<form id="reg-form">
 			<input type="text" autocomplete="off" id="username" placeholder="Username" />
@@ -41,5 +42,35 @@
 				}
 			}
 		</script>
+=======
+		<div class="register-container">
+			<main class="register-main">
+				<h1>Register</h1>
+				<form id="reg-form">
+					<div class="form-control">
+						<label for="username">Username</label>
+						<input
+							type="text"
+							name="username"
+							id="username"
+							placeholder="Enter username..."
+							required
+						/>
+					</div>
+					<div class="form-control">
+						<label for="username">Password</label>
+						<input
+							type="password"
+							name="password"
+							id="password"
+							placeholder="Enter password..."
+							required
+						/>
+					</div>
+					<button onclick="window.location.href='http://localhost:3000/login.html'" type="submit" class="btn">Join Chat</button>
+				</form>
+			</main>
+		</div>
+>>>>>>> Stashed changes
 	</body>
 </html>
